@@ -1,5 +1,5 @@
 import createSagaMiddleware from 'redux-saga';
-import {createStore, applyMiddleware, compose, combineReducers} from "redux";
+import {createStore, applyMiddleware, combineReducers} from "redux";
 import { routerMiddleware, connectRouter } from 'connected-react-router';
 import { createBrowserHistory } from 'history';
 
@@ -12,13 +12,9 @@ const reducer = combineReducers({
    authReducer
 });
 
-const enhancer = compose(
-   applyMiddleware(
-      routerMiddleware(history),
-      sagaMiddleware
-   ),
-   window.__REDUX_DEVTOOLS_EXTENSION__ &&
-   window.__REDUX_DEVTOOLS_EXTENSION__(),
+const enhancer = applyMiddleware(
+   routerMiddleware(history),
+   sagaMiddleware
 );
 
 const store = createStore(reducer, enhancer);

@@ -1,4 +1,5 @@
 import React from 'react';
+// @ts-ignore
 import {Provider} from 'react-redux';
 import {ConnectedRouter} from 'connected-react-router';
 

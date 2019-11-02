@@ -68,6 +68,7 @@ export function* loginSaga() {
       const action = yield take(LOGIN_REQUEST);
 
       try {
+         // @ts-ignore
          const response = Auth.login(action.payload);
 
          if (response.data.status === 'SUCCESS') {
