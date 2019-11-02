@@ -122,4 +122,5 @@ function Auth() {
       </Container>
    );
 }
+
 export default Auth;
