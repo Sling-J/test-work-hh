@@ -1,4 +1,8 @@
-import React from 'react';
+import * as React from 'react';
+import {connect} from "react-redux";
+
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -8,53 +12,46 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
-import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import {useStyles} from './style';
 
-function Copyright() {
-   return (
-      <Typography variant="body2" color="textSecondary" align="center">
-         {'Copyright © '}
-         <Link color="inherit" href="https://material-ui.com/">
-            Ваш сайт
-         </Link>{' '}
-         {new Date().getFullYear()}
-         {'.'}
-      </Typography>
-   );
+import Copyright from "./Copyright";
+import {login} from "../ducks/authSaga";
+import {AppState, ILoginParams, IUserData} from "../models";
+import {MessageBox} from "./style";
+
+type AuthProps = {
+   login: (dataOfForm: ILoginParams) => void;
+   loadingOfForm: boolean;
+   errorMessage: string | {} | null;
+   userData: IUserData | null;
 }
 
-const useStyles = makeStyles(theme => ({
-   paper: {
-      marginTop: theme.spacing(8),
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-   },
-   avatar: {
-      margin: theme.spacing(1),
-      backgroundColor: theme.palette.secondary.main,
-   },
-   form: {
-      width: '100%', // Fix IE 11 issue.
-      marginTop: theme.spacing(1),
-   },
-   submit: {
-      margin: theme.spacing(3, 0, 2),
-      backgroundColor: '#2196f3',
-      '&:hover': {
-         backgroundColor: '#2F80ED'
-      }
-   },
-   link: {
-      color: '#2196f3'
-   }
-}));
-
-function Auth() {
+const Auth: React.FC<AuthProps> = props => {
+   const [email, setEmail] = React.useState<string>('');
+   const [password, setPassword] = React.useState<string>('');
    const classes = useStyles();
+
+   const {login, errorMessage, loadingOfForm, userData} = props;
+
+   const handleSubmit = (event: { preventDefault: () => void; }): void => {
+      event.preventDefault();
+
+      if ((email && password).length !== 0) {
+         login({email, password});
+      }
+   };
+
+   React.useEffect(() => {
+      if (errorMessage) {
+         setPassword('');
+      }
+   }, [errorMessage]);
+
+   const RenderMessage = () =>
+      (errorMessage) ? <p className="message">Ошибка входа. Проверьте данные и повторите попытку.</p> :
+         (userData) ? <p className="message">Вы успешно авторизовались</p> : null;
 
    return (
       <Container component="main" maxWidth="xs">
@@ -66,16 +63,16 @@ function Auth() {
             <Typography component="h1" variant="h5">
                Вход в аккаунт
             </Typography>
-            <form className={classes.form} noValidate>
+            <form onSubmit={handleSubmit} className={classes.form}>
                <TextField
                   variant="outlined"
                   margin="normal"
                   required
                   fullWidth
-                  id="email"
                   label="Почта"
                   name="email"
-                  autoComplete="email"
+                  value={email}
+                  onChange={event => setEmail(event.target.value)}
                   autoFocus
                />
                <TextField
@@ -86,21 +83,24 @@ function Auth() {
                   name="password"
                   label="Пароль"
                   type="password"
-                  id="password"
-                  autoComplete="current-password"
+                  value={password}
+                  onChange={event => setPassword(event.target.value)}
                />
                <FormControlLabel
                   control={<Checkbox value="remember" color="primary"/>}
                   label="Запомнить меня"
                />
                <Button
-                  type="button"
+                  type="submit"
                   fullWidth
                   variant="contained"
                   color="primary"
                   className={classes.submit}
                >
-                  Войти в аккаунт
+                  {loadingOfForm ?
+                     <CircularProgress size={24}/> :
+                     'Войти в аккаунт'
+                  }
                </Button>
                <Grid container>
                   <Grid item xs>
@@ -116,11 +116,22 @@ function Auth() {
                </Grid>
             </form>
          </div>
+
+         <MessageBox err={errorMessage}>
+            <RenderMessage/>
+         </MessageBox>
+
          <Box mt={8}>
             <Copyright/>
          </Box>
       </Container>
    );
-}
+};
 
-export default Auth;
+export default connect((state: AppState) => ({
+   loadingOfForm: state.auth.loadingOfForm,
+   errorMessage: state.auth.errorMessage,
+   userData: state.auth.userData
+}), {
+   login
+})(Auth);

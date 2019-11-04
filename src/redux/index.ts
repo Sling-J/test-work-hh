@@ -3,13 +3,14 @@ import {createStore, applyMiddleware, combineReducers} from "redux";
 import { routerMiddleware, connectRouter } from 'connected-react-router';
 import { createBrowserHistory } from 'history';
 
-import authReducer, {loginSaga} from '../components/ducks/authSaga';
+import authReducer, {loginSaga as rootSaga} from '../ducks/authSaga';
 
 export const history = createBrowserHistory();
 const sagaMiddleware = createSagaMiddleware();
-const reducer = combineReducers({
+
+export const reducer = combineReducers({
    router: connectRouter(history),
-   authReducer
+   auth: authReducer
 });
 
 const enhancer = applyMiddleware(
@@ -19,6 +20,6 @@ const enhancer = applyMiddleware(
 
 const store = createStore(reducer, enhancer);
 
-sagaMiddleware.run(loginSaga);
+sagaMiddleware.run(rootSaga);
 
 export default store;

@@ -1,11 +1,9 @@
 import React from 'react';
-// @ts-ignore
 import {Provider} from 'react-redux';
 import {ConnectedRouter} from 'connected-react-router';
 
-import Auth from "./components/Auth";
-
 import store, {history} from "./redux";
+import Auth from "./components/Auth";
 
 const App: React.FC = () => {
    return (
