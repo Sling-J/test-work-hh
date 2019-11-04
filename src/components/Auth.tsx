@@ -31,6 +31,10 @@ type AuthProps = {
 const Auth: React.FC<AuthProps> = props => {
    const [email, setEmail] = React.useState<string>('');
    const [password, setPassword] = React.useState<string>('');
+   const [inputError, setInputError] = React.useState<{email: boolean, password: boolean}>({
+      email: false,
+      password: false
+   });
    const classes = useStyles();
 
    const {login, errorMessage, loadingOfForm, userData} = props;
@@ -38,7 +42,26 @@ const Auth: React.FC<AuthProps> = props => {
    const handleSubmit = (event: { preventDefault: () => void; }): void => {
       event.preventDefault();
 
-      if ((email && password).length !== 0) {
+      if (email.length === 0 && password.length === 0) {
+         setInputError({
+            email: true,
+            password: true
+         })
+      } else if (email.length === 0 && password.length !== 0) {
+         setInputError({
+            email: true,
+            password: false
+         })
+      } else if (email.length !== 0 && password.length === 0) {
+         setInputError({
+            email: false,
+            password: true
+         })
+      } else {
+         setInputError({
+            email: false,
+            password: false
+         });
          login({email, password});
       }
    };
@@ -63,8 +86,9 @@ const Auth: React.FC<AuthProps> = props => {
             <Typography component="h1" variant="h5">
                Вход в аккаунт
             </Typography>
-            <form onSubmit={handleSubmit} className={classes.form}>
+            <form onSubmit={handleSubmit} className={classes.form} noValidate>
                <TextField
+                  error={inputError.email}
                   variant="outlined"
                   margin="normal"
                   required
@@ -73,9 +97,11 @@ const Auth: React.FC<AuthProps> = props => {
                   name="email"
                   value={email}
                   onChange={event => setEmail(event.target.value)}
+                  helperText="Обязательное поле"
                   autoFocus
                />
                <TextField
+                  error={inputError.password}
                   variant="outlined"
                   margin="normal"
                   required
@@ -85,6 +111,7 @@ const Auth: React.FC<AuthProps> = props => {
                   type="password"
                   value={password}
                   onChange={event => setPassword(event.target.value)}
+                  helperText="Обязательное поле"
                />
                <FormControlLabel
                   control={<Checkbox value="remember" color="primary"/>}
