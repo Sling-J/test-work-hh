@@ -23,6 +23,14 @@ export const useStyles = makeStyles(theme => ({
          backgroundColor: '#2F80ED'
       }
    },
+   textFieldBox: {
+      position: 'relative'
+   },
+   hiddenPass: {
+      position: 'absolute',
+      top: '20%',
+      right: '5px',
+   },
    link: {
       color: '#2196f3'
    }

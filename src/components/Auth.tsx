@@ -2,6 +2,9 @@ import * as React from 'react';
 import {connect} from "react-redux";
 
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
+import IconButton from '@material-ui/core/IconButton';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -31,6 +34,7 @@ type AuthProps = {
 const Auth: React.FC<AuthProps> = props => {
    const [email, setEmail] = React.useState<string>('');
    const [password, setPassword] = React.useState<string>('');
+   const [hidden, setHidden] = React.useState<boolean>(true);
    const [inputError, setInputError] = React.useState<{email: boolean, password: boolean}>({
       email: false,
       password: false
@@ -100,19 +104,24 @@ const Auth: React.FC<AuthProps> = props => {
                   helperText="Обязательное поле"
                   autoFocus
                />
-               <TextField
-                  error={inputError.password}
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="password"
-                  label="Пароль"
-                  type="password"
-                  value={password}
-                  onChange={event => setPassword(event.target.value)}
-                  helperText="Обязательное поле"
-               />
+               <div className={classes.textFieldBox}>
+                  <TextField
+                     error={inputError.password}
+                     variant="outlined"
+                     margin="normal"
+                     required
+                     fullWidth
+                     name="password"
+                     label="Пароль"
+                     type={hidden ? 'password' : 'text'}
+                     value={password}
+                     onChange={event => setPassword(event.target.value)}
+                     helperText="Обязательное поле"
+                  />
+                  <IconButton className={classes.hiddenPass} onClick={() => setHidden(!hidden)}>
+                     {hidden ? <VisibilityOffIcon/> : <VisibilityIcon/>}
+                  </IconButton>
+               </div>
                <FormControlLabel
                   control={<Checkbox value="remember" color="primary"/>}
                   label="Запомнить меня"
